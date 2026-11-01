@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hör mal! – Nemis tili listening</title>
+<style>
+:root{--bg:#fafaf7;--card:#fff;--tx:#1d1d1b;--mu:#6b6b66;--ac:#d9480f;--bd:#e4e2da;--ok:#2b8a3e;--er:#c92a2a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--card:#202025;--tx:#f0efe9;--mu:#a1a09a;--ac:#ff8c42;--bd:#33333a;--ok:#69db7c;--er:#ff8787}}
+:root[data-theme="dark"]{--bg:#17171a;--card:#202025;--tx:#f0efe9;--mu:#a1a09a;--ac:#ff8c42;--bd:#33333a;--ok:#69db7c;--er:#ff8787}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:16px;display:grid;gap:14px}
+h1{margin:0;font-size:24px}h1 span{color:var(--ac)}
+.sub{color:var(--mu);margin:2px 0 0;font-size:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+.songs{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.b{border:0;background:var(--ac);color:#fff;border-radius:10px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+button.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.lyr{display:grid;gap:6px;font-size:18px;line-height:2.1}
+.lyr input{font:inherit;font-size:17px;text-align:center;border:0;border-bottom:2px solid var(--ac);background:transparent;color:var(--tx);padding:0 4px;outline:none;border-radius:0}
+.lyr input.ok{border-color:var(--ok);color:var(--ok)}.lyr input.no{border-color:var(--er);color:var(--er)}
+.ans{color:var(--ok);font-weight:600}
+.score{font-weight:700;font-size:18px}
+label{display:grid;gap:4px;font-size:14px;color:var(--mu)}
+input[type=text],input[type=url],textarea,select{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);width:100%}
+textarea{min-height:160px}
+.wrap2{display:grid;gap:14px}.h2{font-weight:700;margin-bottom:10px}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}.sc{border:1px solid var(--bd);border-radius:12px;padding:12px;cursor:pointer;background:var(--bg);text-align:left;color:var(--tx);font:inherit}.sc b{display:block}.sc span{color:var(--mu);font-size:13px}.sc:hover{border-color:var(--ac)}
+.hid{display:none!important}.mu{color:var(--mu);font-size:13px}
+
+#auth{position:fixed;inset:0;z-index:99;background:var(--bg);display:grid;place-items:center;padding:16px;overflow:auto}
+#auth .card{width:100%;max-width:380px;display:grid;gap:10px}
+#aerr{color:var(--er);font-size:14px;min-height:20px}
+#bar{display:flex;gap:8px;align-items:center;justify-content:space-between}
+#bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lk{background:none;border:0;color:var(--mu);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:0;justify-self:start}
+</style></head><body>
+<div id="auth"><div class="card">
+<h1>Hör <span>mal!</span></h1>
+<p class="sub">Kiring yoki roʻyxatdan oʻting — qoʻshiqlaringiz faqat sizniki boʻladi</p>
+<label>Email<input type="text" id="aE" autocomplete="email" inputmode="email"></label>
+<label>Parol (kamida 6 belgi)<input type="password" id="aP" autocomplete="current-password" style="font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);width:100%"></label>
+<div id="aerr"></div>
+<button class="b" id="aIn">Kirish</button>
+<button class="b g" id="aUp">Roʻyxatdan oʻtish</button>
+<button class="b g" id="aG">Google orqali kirish</button>
+<button class="lk" id="aRs">Parolni unutdim</button>
+</div></div>
+<div class="wrap">
+<div><h1>Hör <span>mal!</span></h1><p class="sub">Qoʻshiq tinglang va tushib qolgan A1–C2 soʻzlarni yozing</p></div>
+<div id="bar" class="mu"><span id="who"></span><button class="b g" id="out" style="padding:6px 12px">Chiqish</button></div>
+
+<div id="home" class="wrap2"><div class="card" id="lib" style="order:2"><div class="h2">Qoʻshilgan qoʻshiqlar</div><div class="cards" id="songs"></div></div>
+
+<div class="card" id="form" style="order:1"><div class="h2">Yangi qoʻshiq qoʻshish</div>
+<div style="display:grid;gap:10px">
+<label>Nomi<input type="text" id="fT"></label>
+<label>Ijrochi<input type="text" id="fA"></label>
+
+<label>YouTube havolasi (sahifa ichida ijro etiladi)<input type="url" id="fY"></label>
+<label>Matn (lyrics) — shu yerga qoʻyib chiqing, har qator alohida<textarea id="fL"></textarea></label>
+<div class="row"><button class="b" id="save">Saqlash</button></div>
+</div></div>
+
+</div>
+<div class="card hid" id="play">
+<button class="b g" id="back" style="margin-bottom:10px">← Qoʻshiqlar roʻyxati</button>
+<div class="row" style="justify-content:space-between">
+<div><strong id="pT"></strong> <span class="mu" id="pA"></span></div>
+<a id="pY" class="mu hid" target="_blank" rel="noopener">YouTube'da ochish ↗</a></div>
+<iframe id="yt" class="hid" style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px;margin-top:10px" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<div class="row" style="margin:10px 0">
+<button class="b" id="pp">▶ Boshlash</button>
+<button class="b g" id="rs">⏮ Boshidan</button>
+<select id="sp" style="width:auto"><option value="1">1× tezlik</option><option value=".8">0.8×</option><option value=".6">0.6×</option></select>
+<button class="b g" id="nw">🔀 Boshqa soʻzlar</button>
+<button class="b g" id="cp">🔗 Havolani nusxalash</button>
+</div>
+<div class="row" style="margin-bottom:10px"><span class="mu">Daraja:</span><span id="lv" class="row"></span><span class="mu" id="cnt"></span><label class="mu" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="fill" style="width:auto"> 12 tagacha to\u02bbldirish</label></div>
+<div class="row" style="margin-bottom:10px"><span class="mu">Belgi:</span>
+<button class="chip" data-c="ä">ä</button><button class="chip" data-c="ö">ö</button><button class="chip" data-c="ü">ü</button><button class="chip" data-c="ß">ß</button></div>
+<div class="lyr" id="lyr"></div>
+<div class="row" style="margin-top:14px">
+<button class="b" id="ck">Tekshirish</button><button class="b g" id="sh">Javoblarni koʻrsatish</button>
+<span class="score" id="sc"></span></div>
+<p class="mu" id="demoNote"></p>
+</div>
+<button class="b g hid" id="del" style="justify-self:start">Bu qoʻshiqni oʻchirish</button>
+</div>
+
+<script>
+const LW={
+A1:`abend aber alle alt apfel arbeit auch auto bahnhof bett bitte blau brot bruder buch danke dein denn deutsch essen fahren familie frau freund gehen gern gestern gut haben haus heiß heißen heute hier hund immer jahr jetzt kaffee kalt katze kind klein kommen können lachen langsam lernen lieben machen mann mein milch morgen mutter nacht name nein neu nicht noch sagen schnell schon schön schule schwester sehen sehr sein singen sonne spielen sprechen stadt straße stuhl tag tisch trinken vater viel wasser wer wie wohnen zeit zimmer zug`,
+A2:`angst arzt bald besuchen bleiben brauchen denken dunkel einfach erklären erzählen fehlen fertig finden fliegen freuen früh fühlen gefallen gesund glücklich hell herz himmel hoffen hören kennen kurz lange leben leise licht liegen meer mensch musik offen reden regen reise richtig ruhig schlafen schlecht schreiben schwer sommer sorgen stark stern suchen traurig träumen verstehen warten weg weit welt winter wissen wunderbar zuhause zurück`,
+B1:`ändern anfang bedeuten beginnen bereit beweisen brechen danken eigentlich einsam enttäuscht erinnern erreichen erwarten flügel fremd gedanken gefühl gelingen geschichte gewinnen gewohnt grenze heimat hoffnung kämpfen kraft lächeln lassen leer lösen mut nähe neugierig sehnsucht spüren stimme streiten tränen trennen trost überall überraschen umarmen unterwegs vergessen verlieren vermissen versprechen verzeihen vorbei wahrheit wählen wenigstens wirklich wunsch zweifel`,
+B2:`abschied anspruch bedauern befreien begegnen behaupten beruhigen berühren bewusst durchhalten ehrlich einsamkeit empfinden entscheiden entschuldigung erfüllen erschöpft gelassen gleichgültig heilen herausforderung hindern kindheit leidenschaft menschlich offenbar scheitern schweigen sehnen sinnlos spiegel stolz taumeln überzeugen umgebung unabhängig unendlich unsicher verletzen verzweifelt vorsichtig widerstand zerbrechen zwingen`,
+C1:`abgrund allmählich anmut aufrichtig bedürfnis beharrlich beklemmend betören dämmerung entgleiten erlösung flüchtig gebrechlich gnade grenzenlos heimsuchen hingabe innehalten kummer lautlos nachhall rastlos reue schwermut trugbild unermesslich vergänglich verheißung verklärt wehmut zerrissen zügellos`,
+C2:`allgegenwärtig anachronistisch ausweglos befremdlich betäubt deplatziert durchdringen entrückt erhaben flüchtigkeit gleichmut inbrunst kontemplativ melancholie nebulös paradox rastlosigkeit sehnsüchtig seelenruhe sinnbild tröstlich überdauern unausweichlich unergründlich unsagbar verhängnisvoll verwehen wehmütig weltschmerz zeitlos zwiespalt`};
+const stem=w=>{w=w.toLowerCase();for(const e of ['en','er','es','em','st','e','n','t','s']){if(w.length>e.length+3&&w.endsWith(e))return w.slice(0,-e.length)}return w};
+const LV={};let level='A1–B1';try{level=localStorage.getItem('lvl')||'A1–B1'}catch(e){}
+for(const k in LW)LW[k].split(/\s+/).forEach(w=>{const t=stem(w);if(!LV[t])LV[t]=k});
+function lvls(){const c=$('lv');c.innerHTML='';['A1–B1',...Object.keys(LW)].forEach(k=>{const b=document.createElement('button');b.className='chip'+(k===level?' on':'');b.textContent=k;b.onclick=()=>{level=k;try{localStorage.setItem('lvl',k)}catch(e){}lvls();if(cur)build()};c.appendChild(b)})}
+const $=id=>document.getElementById(id);
+let songs=[],cur=null,blanks=[],au=new Audio(),playing=false,mem=[];
+/* storage: har foydalanuvchi uchun alohida (Firebase) */
+async function all(){return await window.cloud.all()}
+async function put(s){s.t=s.t||Date.now();try{await window.cloud.put(s)}catch(e){alert('Saqlab bo\u02bblmadi \u2014 internetni tekshiring')}}
+async function rm(id){try{await window.cloud.rm(id)}catch(e){}}
+/* ui */
+function list(){const c=$('songs');c.innerHTML=songs.length?'':'<span class="mu">Hozircha qo\u02bbshiq yo\u02bbq \u2014 yuqoridagi shakl orqali qo\u02bbshing</span>';songs.slice().reverse().forEach(s=>{const b=document.createElement('button');b.className='sc';const t=document.createElement('b');t.textContent=s.title;const a=document.createElement('span');a.textContent=s.artist||'';b.append(t,a);b.onclick=()=>open(s);c.appendChild(b)})}
+function stop(){au.pause();ytCmd('pauseVideo');playing=false;$('pp').textContent='▶ Boshlash'}
+function open(s){stop();cur=s;list();try{history.replaceState(null,'','#'+s.id)}catch(e){}$('play').classList.remove('hid');$('home').classList.add('hid');window.scrollTo(0,0);$('pT').textContent=s.title;$('pA').textContent=s.artist?'— '+s.artist:'';
+const y=$('pY');if(s.yt){y.href=s.yt;y.classList.remove('hid')}else y.classList.add('hid');
+$('del').classList.remove('hid');
+const vid=ytId(s.yt),fr=$('yt');if(vid){fr.src='https://www.youtube-nocookie.com/embed/'+vid+'?enablejsapi=1&playsinline=1&rel=0';fr.classList.remove('hid')}else{fr.removeAttribute('src');fr.classList.add('hid')}
+$('demoNote').textContent='';
+if(s.blob)au.src=URL.createObjectURL(s.blob);
+build()}
+function build(){const lines=cur.lyrics.split('\n').map(l=>l.trim()).filter(Boolean);
+const re=/[A-Za-zÄÖÜäöüß]+/g,idx=Object.keys(LW),li=level==='A1–B1'?1:idx.indexOf(level),cand=[];const inR=v=>level==='A1–B1'?'A1 A2 B1'.includes(v):v===level;
+lines.forEach((l,i)=>{[...l.matchAll(re)].forEach(x=>{const w=x[0],lv=LV[stem(w)];if(w.length<3||(w.length<4&&!lv))return;const d=lv?(inR(lv)?0:Math.abs(idx.indexOf(lv)-li)):9;x.lv=lv;if(d===0||fillOn())cand.push({i,x,d,r:Math.random()})})});
+let pick=[];const used=new Set();
+[...new Set(cand.map(c=>c.d))].sort((p,q)=>p-q).forEach(d=>{const t=cand.filter(c=>c.d===d).sort((p,q)=>p.r-q.r);
+t.forEach(c=>{if(pick.length<12&&!used.has(c.i)){pick.push(c);used.add(c.i)}});
+t.forEach(c=>{if(pick.length<12&&!pick.includes(c))pick.push(c)})});
+$('cnt').textContent=pick.length+' ta bo\u02bbshliq'+(fillOn()?' ('+pick.filter(p=>p.d===0).length+' tasi '+level+')':(pick.length<12?' \u2014 matnda '+level+' darajasi shuncha':''));const by={};pick.forEach(p=>(by[p.i]=by[p.i]||[]).push(p.x));
+const box=$('lyr');box.innerHTML='';blanks=[];$('sc').textContent='';
+lines.forEach((l,i)=>{const d=document.createElement('div');let pos=0;(by[i]||[]).sort((a,b)=>a.index-b.index).forEach(x=>{d.append(l.slice(pos,x.index));const inp=document.createElement('input');inp.type='text';inp.placeholder=x.lv&&(level==='A1–B1'||x.lv!==level)?x.lv:'';inp.autocomplete='off';inp.autocapitalize='off';inp.spellcheck=false;inp.style.width=Math.max(4,x[0].length+2)+'ch';d.appendChild(inp);blanks.push({inp,w:x[0]});pos=x.index+x[0].length});d.append(l.slice(pos));box.appendChild(d)})}
+const norm=s=>s.trim().toLowerCase().replace(/ß/g,'ss');
+$('ck').onclick=()=>{let ok=0;blanks.forEach(b=>{const r=norm(b.inp.value)===norm(b.w);b.inp.className=r?'ok':(b.inp.value?'no':'');if(r)ok++});$('sc').textContent=ok+' / '+blanks.length+(ok===blanks.length?' 🎉':'')};
+$('sh').onclick=()=>{blanks.forEach(b=>{b.inp.value=b.w;b.inp.className='ok'});$('sc').textContent=''};
+$('nw').onclick=build;
+document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const a=document.activeElement;if(a&&a.tagName==='INPUT'&&a.type==='text'&&a.closest('#lyr')){const p=a.selectionStart;a.setRangeText(b.dataset.c,p,a.selectionEnd,'end');a.focus()}});
+function ytId(u){const m=(u||'').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);return m?m[1]:''}
+function ytCmd(f,a){const fr=$('yt');try{fr.contentWindow&&fr.contentWindow.postMessage(JSON.stringify({event:'command',func:f,args:a||[]}),'*')}catch(e){}}
+/* playback */
+function say(){const u=new SpeechSynthesisUtterance(cur.lyrics.replace(/\n/g,'. '));u.lang='de-DE';u.rate=.8*parseFloat($('sp').value);u.onend=()=>{playing=false;$('pp').textContent='▶ Boshlash'};speechSynthesis.cancel();speechSynthesis.speak(u)}
+$('pp').onclick=()=>{if(!cur)return;if(playing){stop();return}
+if(cur.blob){au.playbackRate=parseFloat($('sp').value);au.play()}else{ytCmd('setPlaybackRate',[parseFloat($('sp').value)]);ytCmd('playVideo')}playing=true;$('pp').textContent='⏸ Toʻxtatish'};
+$('rs').onclick=()=>{if(!cur)return;if(cur.blob){au.currentTime=0}else{ytCmd('seekTo',[0,true])}};
+$('sp').onchange=()=>{const v=parseFloat($('sp').value);au.playbackRate=v;ytCmd('setPlaybackRate',[v])};
+au.onended=()=>{playing=false;$('pp').textContent='▶ Boshlash'};
+/* add song */
+
+
+$('save').onclick=async()=>{const t=$('fT').value.trim(),l=$('fL').value.trim();if(!t||!l){alert('Nomi va matnni toʻldiring');return}if(!ytId($('fY').value)){alert('Toʻgʻri YouTube havolasini kiriting');return}
+const f=null;const s={id:'s'+Date.now(),title:t,artist:$('fA').value.trim(),yt:$('fY').value.trim(),lyrics:l,blob:f||null};
+await put(s);songs.push(s);['fT','fA','fY','fL'].forEach(i=>$(i).value='');open(s)};
+$('del').onclick=async()=>{if(cur&&confirm('Oʻchirilsinmi?')){await rm(cur.id);songs=songs.filter(x=>x.id!==cur.id);stop();$('play').classList.add('hid');$('del').classList.add('hid');$('home').classList.remove('hid');cur=null;list()}};
+lvls();
+window.start=async()=>{songs=await all();list();const id=location.hash.slice(1),f=songs.find(x=>x.id===id);if(f)open(f)};
+window.reset=()=>{stop();songs=[];cur=null;$('yt').removeAttribute('src');$('play').classList.add('hid');$('del').classList.add('hid');$('home').classList.remove('hid');list()};
+const fillOn=()=>$('fill').checked;$('fill').onchange=()=>{if(cur)build()};
+$('back').onclick=()=>{stop();$('play').classList.add('hid');$('del').classList.add('hid');$('home').classList.remove('hid');cur=null;list();try{history.replaceState(null,'',location.pathname)}catch(e){}};
+$('cp').onclick=async()=>{try{await navigator.clipboard.writeText(location.href);$('cp').textContent='\u2713 Nusxalandi'}catch(e){prompt('Havola:',location.href)}setTimeout(()=>$('cp').textContent='\U0001F517 Havolani nusxalash',1500)};
+</script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,signOut,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getDatabase,ref,get,set,remove} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+/* ===== FIREBASE SOZLAMASI (Console > Project settings > Your apps dan aynan nusxalang) ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAes3xk0l2MMRyMD1UvkK5fChVnbyDcn_E",
+  authDomain: "hor-mal.firebaseapp.com",
+  databaseURL: "https://hor-mal-default-rtdb.firebaseio.com",
+  projectId: "hor-mal",
+  storageBucket: "hor-mal.firebasestorage.app",
+  messagingSenderId: "294222117488",
+  appId: "1:294222117488:web:05a3499b1214ba0c2392b5"
+};
+/* ================================================================================== */
+
+const app=initializeApp(firebaseConfig),auth=getAuth(app),rdb=getDatabase(app);
+const g=id=>document.getElementById(id);
+let uid=null;
+const path=id=>'users/'+uid+'/songs'+(id?'/'+id:'');
+window.cloud={
+  async all(){const s=await get(ref(rdb,path()));const o=s.val()||{};return Object.values(o).sort((a,b)=>(a.t||0)-(b.t||0))},
+  put:s=>set(ref(rdb,path(s.id)),s),
+  rm:id=>remove(ref(rdb,path(id)))
+};
+const MSG={
+  'auth/invalid-credential':'Email yoki parol notoʻgʻri',
+  'auth/wrong-password':'Email yoki parol notoʻgʻri',
+  'auth/user-not-found':'Email yoki parol notoʻgʻri',
+  'auth/invalid-email':'Email notoʻgʻri yozilgan',
+  'auth/email-already-in-use':'Bu email bilan allaqachon roʻyxatdan oʻtilgan — "Kirish" ni bosing',
+  'auth/weak-password':'Parol juda qisqa (kamida 6 belgi)',
+  'auth/missing-password':'Parolni kiriting',
+  'auth/too-many-requests':'Juda koʻp urinish. Birozdan keyin qayta urining',
+  'auth/network-request-failed':'Internet yoʻq yoki ulanmadi',
+  'auth/popup-closed-by-user':'',
+  'auth/cancelled-popup-request':'',
+  'auth/operation-not-allowed':'Console\u2019da Authentication usuli yoqilmagan',
+  'auth/unauthorized-domain':'Bu sayt manzili Authentication > Settings > Authorized domains ga qoʻshilmagan'
+};
+const fail=e=>{g('aerr').textContent=(e.code in MSG)?MSG[e.code]:('Xatolik: '+(e.code||e.message))};
+const cred=()=>[g('aE').value.trim(),g('aP').value];
+const run=f=>async()=>{g('aerr').textContent='';try{await f()}catch(e){fail(e)}};
+g('aIn').onclick=run(()=>signInWithEmailAndPassword(auth,...cred()));
+g('aUp').onclick=run(()=>createUserWithEmailAndPassword(auth,...cred()));
+g('aG').onclick=run(()=>signInWithPopup(auth,new GoogleAuthProvider()));
+g('aRs').onclick=run(async()=>{const e=g('aE').value.trim();if(!e){g('aerr').textContent='Avval emailni yozing';return}await sendPasswordResetEmail(auth,e);g('aerr').textContent='Parolni tiklash xati emailga yuborildi'});
+g('aP').onkeydown=e=>{if(e.key==='Enter')g('aIn').click()};
+g('out').onclick=()=>signOut(auth);
+onAuthStateChanged(auth,u=>{
+  if(u){uid=u.uid;g('who').textContent=u.email||u.displayName||'';g('auth').classList.add('hid');g('aP').value='';window.start()}
+  else{uid=null;g('auth').classList.remove('hid');window.reset()}
+});
+</script>
+</body></html>
