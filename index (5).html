@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hör mal! – Nemis tili listening</title>
+<style>
+:root{--bg:#fafaf7;--card:#fff;--tx:#1d1d1b;--mu:#6b6b66;--ac:#d9480f;--bd:#e4e2da;--ok:#2b8a3e;--er:#c92a2a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--card:#202025;--tx:#f0efe9;--mu:#a1a09a;--ac:#ff8c42;--bd:#33333a;--ok:#69db7c;--er:#ff8787}}
+:root[data-theme="dark"]{--bg:#17171a;--card:#202025;--tx:#f0efe9;--mu:#a1a09a;--ac:#ff8c42;--bd:#33333a;--ok:#69db7c;--er:#ff8787}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:16px;display:grid;gap:14px}
+h1{margin:0;font-size:24px}h1 span{color:var(--ac)}
+.sub{color:var(--mu);margin:2px 0 0;font-size:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+.songs{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.b{border:0;background:var(--ac);color:#fff;border-radius:10px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+button.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.lyr{display:grid;gap:6px;font-size:18px;line-height:2.1}
+.lyr input{font:inherit;font-size:17px;text-align:center;border:0;border-bottom:2px solid var(--ac);background:transparent;color:var(--tx);padding:0 4px;outline:none;border-radius:0}
+.lyr input.ok{border-color:var(--ok);color:var(--ok)}.lyr input.no{border-color:var(--er);color:var(--er)}
+.ans{color:var(--ok);font-weight:600}
+.score{font-weight:700;font-size:18px}
+label{display:grid;gap:4px;font-size:14px;color:var(--mu)}
+input[type=text],input[type=url],textarea,select{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);width:100%}
+textarea{min-height:160px}
+.hid{display:none}.mu{color:var(--mu);font-size:13px}
+</style></head><body>
+<div class="wrap">
+<div><h1>Hör <span>mal!</span></h1><p class="sub">Qoʻshiq tinglang va tushib qolgan A1–B1 soʻzlarni yozing</p></div>
+
+<div class="card"><div class="songs" id="songs"></div>
+<div class="row" style="margin-top:10px"><button class="b g" id="addBtn">+ Qoʻshiq qoʻshish</button></div></div>
+
+<div class="card hid" id="form">
+<div style="display:grid;gap:10px">
+<label>Nomi<input type="text" id="fT"></label>
+<label>Ijrochi<input type="text" id="fA"></label>
+
+<label>YouTube havolasi (sahifa ichida ijro etiladi)<input type="url" id="fY"></label>
+<label>Matn (lyrics) — shu yerga qoʻyib chiqing, har qator alohida<textarea id="fL"></textarea></label>
+<div class="row"><button class="b" id="save">Saqlash</button><button class="b g" id="cancel">Bekor qilish</button></div>
+</div></div>
+
+<div class="card hid" id="play">
+<div class="row" style="justify-content:space-between">
+<div><strong id="pT"></strong> <span class="mu" id="pA"></span></div>
+<a id="pY" class="mu hid" target="_blank" rel="noopener">YouTube'da ochish ↗</a></div>
+<iframe id="yt" class="hid" style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px;margin-top:10px" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<div class="row" style="margin:10px 0">
+<button class="b" id="pp">▶ Boshlash</button>
+<button class="b g" id="rs">⏮ Boshidan</button>
+<select id="sp" style="width:auto"><option value="1">1× tezlik</option><option value=".8">0.8×</option><option value=".6">0.6×</option></select>
+<button class="b g" id="nw">🔀 Boshqa soʻzlar</button>
+</div>
+<div class="row" style="margin-bottom:10px"><span class="mu">Belgi:</span>
+<button class="chip" data-c="ä">ä</button><button class="chip" data-c="ö">ö</button><button class="chip" data-c="ü">ü</button><button class="chip" data-c="ß">ß</button></div>
+<div class="lyr" id="lyr"></div>
+<div class="row" style="margin-top:14px">
+<button class="b" id="ck">Tekshirish</button><button class="b g" id="sh">Javoblarni koʻrsatish</button>
+<span class="score" id="sc"></span></div>
+<p class="mu" id="demoNote"></p>
+</div>
+<button class="b g hid" id="del" style="justify-self:start">Bu qoʻshiqni oʻchirish</button>
+</div>
+
+<script>
+const WORDS=`aber alle allein alles also alt am anders antwort arbeit arbeiten arm auch auf auge augen aus auto bad bahnhof bald bei beide bein bett bild bin bis bist bitte bleiben blau blume brauchen brief bruder buch da dann dein denken denn der deutsch dich dir dort draußen du dunkel durch ein einfach eins ende er erst essen euch fahren fallen familie fast fenster finden fliegen frau frei freund freunde frisch froh früh fühlen für ganz geben gehen geld gern gestern gibt glauben glück glücklich groß gut haben halten hand hast hat haus heiß heißen helfen hell herz heute hier hilfe himmel hören ich ihr immer jahr jede jetzt jung kaffee kalt kann kennen kind kinder klein kommen können kurz lachen lang lange laufen leben leicht leise lernen lesen leute licht lieb liebe lieben lied liegen links los machen mal mann meer mehr mein meine mensch mich mir mit morgen müde musik muss müssen mutter nach nacht nah name neben nehmen nein neu nicht nichts nie nimmt noch nur oben oder offen ohne ort papa regen rechts reden richtig sagen schlafen schnell schon schön schreiben schwer sehen sehr sein seit sie singen sitzen so sollen sommer sonne spät spielen sprechen stadt stark stehen stern sterne straße suchen tag tage tanzen tausend tisch tochter traum träumen traurig trinken tun und uns unser vater viel vielleicht vom von vor warten warum was wasser weg weil weit welt wenn wer werden wie wieder will willst wir wirklich wissen wo woche wohnen wollen wort wunderbar zeit zimmer zu zurück zusammen zwei`.split(/\s+/);
+const SET=new Set(WORDS);
+const $=id=>document.getElementById(id);
+let songs=[],cur=null,blanks=[],au=new Audio(),playing=false,mem=[];
+/* storage */
+function db(){return new Promise((res,rej)=>{try{const r=indexedDB.open('hormal',1);r.onupgradeneeded=()=>r.result.createObjectStore('s',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej()}catch(e){rej(e)}})}
+async function all(){try{const d=await db();return await new Promise(r=>{const q=d.transaction('s').objectStore('s').getAll();q.onsuccess=()=>r(q.result);q.onerror=()=>r(mem)})}catch(e){return mem}}
+async function put(s){try{const d=await db();await new Promise(r=>{const t=d.transaction('s','readwrite');t.objectStore('s').put(s);t.oncomplete=r;t.onerror=r})}catch(e){mem.push(s)}}
+async function rm(id){try{const d=await db();await new Promise(r=>{const t=d.transaction('s','readwrite');t.objectStore('s').delete(id);t.oncomplete=r;t.onerror=r})}catch(e){mem=mem.filter(x=>x.id!==id)}}
+/* ui */
+function list(){const c=$('songs');c.innerHTML=songs.length?'':'<span class="mu">Hozircha qoʻshiq yoʻq — pastdagi tugma bilan qoʻshing</span>';songs.forEach(s=>{const b=document.createElement('button');b.className='chip'+(cur&&cur.id===s.id?' on':'');b.textContent=s.title;b.onclick=()=>open(s);c.appendChild(b)})}
+function stop(){au.pause();ytCmd('pauseVideo');playing=false;$('pp').textContent='▶ Boshlash'}
+function open(s){stop();cur=s;list();$('play').classList.remove('hid');$('pT').textContent=s.title;$('pA').textContent=s.artist?'— '+s.artist:'';
+const y=$('pY');if(s.yt){y.href=s.yt;y.classList.remove('hid')}else y.classList.add('hid');
+$('del').classList.remove('hid');
+const vid=ytId(s.yt),fr=$('yt');if(vid){fr.src='https://www.youtube-nocookie.com/embed/'+vid+'?enablejsapi=1&playsinline=1&rel=0';fr.classList.remove('hid')}else{fr.removeAttribute('src');fr.classList.add('hid')}
+$('demoNote').textContent='';
+if(s.blob)au.src=URL.createObjectURL(s.blob);
+build()}
+function build(){const lines=cur.lyrics.split('\n').map(l=>l.trim()).filter(Boolean);
+const re=/[A-Za-zÄÖÜäöüß]+/g,cand=[];
+lines.forEach((l,i)=>{const m=[...l.matchAll(re)].filter(x=>x[0].length>=3&&SET.has(x[0].toLowerCase()));if(m.length)cand.push({i,m})});
+let pick=[];cand.forEach(c=>pick.push({i:c.i,x:c.m[Math.floor(Math.random()*c.m.length)]}));
+if(pick.length>12){const st=pick.length/12;pick=Array.from({length:12},(_,k)=>pick[Math.floor(k*st)])}
+else{const used=new Set(pick.map(p=>p.i+':'+p.x.index));const rest=[];cand.forEach(c=>c.m.forEach(x=>{if(!used.has(c.i+':'+x.index))rest.push({i:c.i,x})}));rest.sort(()=>Math.random()-.5);pick=pick.concat(rest.slice(0,12-pick.length))}
+const by={};pick.forEach(p=>(by[p.i]=by[p.i]||[]).push(p.x));
+const box=$('lyr');box.innerHTML='';blanks=[];$('sc').textContent='';
+lines.forEach((l,i)=>{const d=document.createElement('div');let pos=0;(by[i]||[]).sort((a,b)=>a.index-b.index).forEach(x=>{d.append(l.slice(pos,x.index));const inp=document.createElement('input');inp.type='text';inp.autocomplete='off';inp.autocapitalize='off';inp.spellcheck=false;inp.style.width=Math.max(4,x[0].length+2)+'ch';d.appendChild(inp);blanks.push({inp,w:x[0]});pos=x.index+x[0].length});d.append(l.slice(pos));box.appendChild(d)})}
+const norm=s=>s.trim().toLowerCase().replace(/ß/g,'ss');
+$('ck').onclick=()=>{let ok=0;blanks.forEach(b=>{const r=norm(b.inp.value)===norm(b.w);b.inp.className=r?'ok':(b.inp.value?'no':'');if(r)ok++});$('sc').textContent=ok+' / '+blanks.length+(ok===blanks.length?' 🎉':'')};
+$('sh').onclick=()=>{blanks.forEach(b=>{b.inp.value=b.w;b.inp.className='ok'});$('sc').textContent=''};
+$('nw').onclick=build;
+document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const a=document.activeElement;if(a&&a.tagName==='INPUT'&&a.type==='text'&&a.closest('#lyr')){const p=a.selectionStart;a.setRangeText(b.dataset.c,p,a.selectionEnd,'end');a.focus()}});
+function ytId(u){const m=(u||'').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);return m?m[1]:''}
+function ytCmd(f,a){const fr=$('yt');try{fr.contentWindow&&fr.contentWindow.postMessage(JSON.stringify({event:'command',func:f,args:a||[]}),'*')}catch(e){}}
+/* playback */
+function say(){const u=new SpeechSynthesisUtterance(cur.lyrics.replace(/\n/g,'. '));u.lang='de-DE';u.rate=.8*parseFloat($('sp').value);u.onend=()=>{playing=false;$('pp').textContent='▶ Boshlash'};speechSynthesis.cancel();speechSynthesis.speak(u)}
+$('pp').onclick=()=>{if(!cur)return;if(playing){stop();return}
+if(cur.blob){au.playbackRate=parseFloat($('sp').value);au.play()}else{ytCmd('setPlaybackRate',[parseFloat($('sp').value)]);ytCmd('playVideo')}playing=true;$('pp').textContent='⏸ Toʻxtatish'};
+$('rs').onclick=()=>{if(!cur)return;if(cur.blob){au.currentTime=0}else{ytCmd('seekTo',[0,true])}};
+$('sp').onchange=()=>{const v=parseFloat($('sp').value);au.playbackRate=v;ytCmd('setPlaybackRate',[v])};
+au.onended=()=>{playing=false;$('pp').textContent='▶ Boshlash'};
+/* add song */
+$('addBtn').onclick=()=>$('form').classList.toggle('hid');
+$('cancel').onclick=()=>$('form').classList.add('hid');
+$('save').onclick=async()=>{const t=$('fT').value.trim(),l=$('fL').value.trim();if(!t||!l){alert('Nomi va matnni toʻldiring');return}if(!ytId($('fY').value)){alert('Toʻgʻri YouTube havolasini kiriting');return}
+const f=null;const s={id:'s'+Date.now(),title:t,artist:$('fA').value.trim(),yt:$('fY').value.trim(),lyrics:l,blob:f||null};
+await put(s);songs.push(s);['fT','fA','fY','fL'].forEach(i=>$(i).value='');$('form').classList.add('hid');open(s)};
+$('del').onclick=async()=>{if(cur&&confirm('Oʻchirilsinmi?')){await rm(cur.id);songs=songs.filter(x=>x.id!==cur.id);stop();$('play').classList.add('hid');$('del').classList.add('hid');cur=null;list()}};
+(async()=>{songs=await all();list();if(songs.length)open(songs[0])})();
+</script></body></html>
